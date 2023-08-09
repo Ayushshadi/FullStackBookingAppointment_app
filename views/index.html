@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <style>
+    body {
+    background-color: rgb(157, 189, 253);
+}
+
+.booking-form {
+    background-color:rgb(219, 219, 88);
+    margin-right: 75%;
+    padding: 1rem 0.5rem;
+}
+.heading {
+    font-family: 'Times New Roman', Times, serif
+}
+
+.inputs {
+    font-size: 18px;
+    padding: 0.5rem;
+
+}
+
+.buttons {
+    padding: 0.5rem;
+}
+
+
+.btn{
+    margin: 5px;
+}
+
+
+.users {
+    padding: 0.5rem;
+    
+}
+    </style>
+    <title>Book Appoinment </title>
+  </head>
+  <body>
+    <header>
+      <h1 class="heading">Booking Appoinment Application</h1>
+    </header>
+
+    <section class="container">
+      <form id="form"action="/post/addUser"method="POST" class="booking-form">
+        <h1>Add Your Details</h1>
+        <div class="msg"></div>
+        <div class="inputs">
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" size="30"/>
+        </div>
+        <div class="inputs">
+          <label for="email">Email:</label>
+          <input type="text" id="email" name="email"size="30"/>
+        </div>
+        <div class="inputs">
+          <label for="phone_no">Phone:</label>
+          <input type="text" id="phone_no" name="phone_no"size="30"/>
+        </div>
+        <div class="buttons">
+            <input class="btn"  type="submit" value="Submit" size="30" />
+        </div>
+        
+      </form>
+
+      <ul id="users"></ul>
+
+       <!-- <ul class="items">
+        <li class="item">Item 1</li>
+        <li class="item">Item 2</li>
+        <li class="item">Item 3</li>
+      </ul> --> 
+    </section>
+    <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.2/axios.min.js"
+    integrity="sha512-QTnb9BQkG4fBYIt9JGvYmxPpd6TBeKp6lsUrtiVQsrJ9sb33Bn9s0wMQO9qVBFbPX3xHRAsBHvXlcsrnJjExjg=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
+    <script>
+var form = document.querySelector("#form");
+var users = document.getElementById('users');
+async function getAllUsers(){
+     try {
+        const res = await axios.get("http://localhost:3000/get/users");
+        res.data.forEach((user)=>{
+            const parentNode = document.getElementById("users");
+            const childNode = document.createElement('li');
+            childNode.setAttribute("userEmail", user.email);
+            let del = document.createElement('button');
+            let edit = document.createElement('button');
+             del.className = 'delete';
+             edit.className = 'edit';
+             del.appendChild(document.createTextNode('X'));
+             edit.appendChild(document.createTextNode('Y'));
+             var textToBePut = `${user.name} - ${user.email} - ${user.phone_no}`;
+             childNode.appendChild(document.createTextNode(textToBePut));
+             childNode.appendChild(edit);
+             childNode.appendChild(del);
+             parentNode.appendChild(childNode);
+        })
+     } catch (err) {
+        console.log(err);
+     }
+}
+
+document.addEventListener("DOMContentLoaded", getAllUsers);
+
+users.addEventListener("click", deleteUser);
+async function deleteUser(e){
+     try {
+        if(e.target.classList.contains("delete")){
+            let id;
+            var parentNode = e.target.parentElement;
+            let userEmail = parentNode.getAttribute('email');
+            console.log(userEmail);
+            const res = await axios.get("http://localhost:3000/get/users");
+            res.data.forEach((user)=>{
+                if(user.email===userEmail){
+                    id = user.id;
+                }
+            });
+            const deleteUser = await axios.get(`http://localhost:3000/get/deleteUser/${id}`);
+            window.location.reload();
+        }
+     } catch (err) {
+        console.log(err);
+     }
+}
+    </script>
+   
+  </body>
+</html>
